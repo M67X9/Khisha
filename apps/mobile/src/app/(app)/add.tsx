@@ -26,7 +26,7 @@ const MB = 1024 * 1024;
 
 /**
  * Add Memory (Figma: 3 · Add Memory). Pick one file, check it, upload it to private storage, then let the AI read it
- * into a draft memory. The review-and-save step comes in milestone M6.
+ * into a draft memory. The draft then opens on the review screen (M6).
  */
 export default function AddMemoryScreen() {
   const { t, formatNumber } = useI18n();
@@ -57,7 +57,7 @@ export default function AddMemoryScreen() {
     try {
       await startExtraction(jobId);
       const { memoryId } = await waitForExtraction(jobId, control.current);
-      if (!control.current.cancelled) router.replace(`/memory/${memoryId}`);
+      if (!control.current.cancelled) router.replace(`/review/${memoryId}`);
     } catch (e) {
       if (control.current.cancelled) return;
       setIssue(e instanceof ExtractFailure ? e.issue : { key: "extract.err.generic" });

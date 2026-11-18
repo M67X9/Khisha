@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -38,6 +38,11 @@ export default function MemoryDetailScreen() {
     return { memory, evidence };
   }, [id]);
   const [expanded, setExpanded] = useState(false);
+
+  // A draft is finished on the review screen, not here.
+  useEffect(() => {
+    if (state.status === "ok" && state.data?.memory.status === "draft") router.replace(`/review/${state.data.memory.id}`);
+  }, [state]);
 
   const confirmDelete = () => {
     Alert.alert(t("memory.deleteTitle"), t("memory.deleteBody"), [
@@ -210,11 +215,12 @@ function EvidenceRow({ evidence }: { evidence: MemoryEvidence }) {
   const known = EVIDENCE_LABELS[evidence.field_key];
   const label = known ? t(known) : evidence.field_key.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
   const needsConfirm = evidence.is_critical && !evidence.confirmed_at;
+  const isConfirmed = evidence.is_critical && !!evidence.confirmed_at;
   const low = evidence.confidence !== null && evidence.confidence < 0.7;
   return (
     <View style={{ gap: 6 }}>
       <KeyValue label={label} value={evidence.value ?? ""} />
-      {(needsConfirm || low) && (
+      {(needsConfirm || low || isConfirmed) && (
         <View style={styles.flags}>
           {needsConfirm && (
             <View style={[styles.flag, styles.flagConfirm]}>
@@ -223,7 +229,14 @@ function EvidenceRow({ evidence }: { evidence: MemoryEvidence }) {
               </AppText>
             </View>
           )}
-          {low && (
+          {isConfirmed && (
+            <View style={[styles.flag, styles.flagOk]}>
+              <AppText variant="caption" color={colors.statusVerified}>
+                {t("review.confirmed")}
+              </AppText>
+            </View>
+          )}
+          {low && !isConfirmed && (
             <View style={[styles.flag, styles.flagLow]}>
               <AppText variant="caption" color={colors.statusError}>
                 {t("evidence.lowConfidence")}
@@ -263,6 +276,7 @@ const styles = StyleSheet.create({
   flags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   flag: { borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 },
   flagConfirm: { backgroundColor: "rgba(168,95,0,0.12)" },
+  flagOk: { backgroundColor: colors.tintVerified },
   flagLow: { backgroundColor: "rgba(194,54,54,0.10)" },
   panel: { backgroundColor: colors.surface, borderRadius: radius.md, padding: 16, gap: 12, ...shadowPanel },
   kv: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 },
