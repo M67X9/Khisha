@@ -130,7 +130,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: i18n with language switch; full RTL layout (RN needs a reload to flip direction); Home with Search, Ask AI, Add Memory, recent-memories list, usage indicator and Settings entries (placeholders OK); `preferred_language` saved on the profile.
   - Test: switch to Arabic from Settings; the whole app flips right-to-left and text is Arabic; switch back; choice survives a relaunch.
 
-- [ ] **M2b — Personal touch: name, gender, greeting and colour tones** *(added at the owner's request; built and checked locally, waiting for the manual test in Expo Go)*
+- [x] **M2b — Personal touch: name, gender, greeting and colour tones** *(added at the owner's request; done)*
   - Build: `display_name` and `gender` (male / female / prefer not to say) on `profiles`, filled from the sign-up form by the existing trigger; sign-up asks for both; Home greets by name and time of day with a sentence that changes daily; Arabic sentences use feminine wording when "female" is chosen; three colour tones (violet = original, rose-violet, indigo-blue) plus a slightly different hero-card roundness; a Your profile screen to edit both; a prompt on Home for older accounts without a name.
   - Test: sign up as a woman, as a man and as "prefer not to say" and see three tones and a greeting with each name; switch to Arabic and check the wording; edit the profile and watch the colours change.
   - Privacy note: gender is only ever chosen by the person, never inferred; it is not sent to the AI provider or analytics.
