@@ -12,7 +12,15 @@
       "expo-secure-store",
       "expo-localization",
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Khisha needs access to your photos so you can choose a screenshot or picture to save as a memory.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": false
