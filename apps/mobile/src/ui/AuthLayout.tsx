@@ -6,14 +6,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useI18n } from "../i18n";
 import { AppText } from "./AppText";
 import { LanguageChip } from "./LanguageChip";
-import { colors, gradients } from "./theme";
+import { colors } from "./theme";
+import { useTheme } from "./ThemeProvider";
 
 /** Gradient hero with the brand on top and a white sheet with the form at the bottom (matches the Figma Sign in screen). */
 export function AuthLayout({ title, children }: { title: string; children: ReactNode }) {
   const { t, lang } = useI18n();
+  const theme = useTheme();
   return (
     <View style={styles.root}>
-      <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+      <LinearGradient colors={[...theme.gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
         <SafeAreaView edges={["top"]} style={styles.heroSafe}>
           <View style={styles.chipRow}>
             <LanguageChip />

@@ -9,14 +9,17 @@ import { useAuth } from "../../lib/auth";
 import { AppText } from "../../ui/AppText";
 import { Button } from "../../ui/Button";
 import { ScreenHeader } from "../../ui/ScreenHeader";
-import { colors, gradients, radius, shadowPanel } from "../../ui/theme";
+import { colors, radius, shadowPanel } from "../../ui/theme";
+import { useTheme } from "../../ui/ThemeProvider";
 
 /** Settings (Figma: 11 · Settings). Usage numbers are demo values until milestone M10. */
 export default function SettingsScreen() {
   const { t, lang, isRTL, setLanguage, formatNumber } = useI18n();
+  const theme = useTheme();
   const { session, profile, profileError, signOut } = useAuth();
   const email = session?.user.email ?? "";
-  const initial = (email[0] ?? "?").toUpperCase();
+  const shownName = profile?.display_name || email;
+  const initial = (Array.from(shownName)[0] ?? "?").toUpperCase();
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -24,27 +27,27 @@ export default function SettingsScreen() {
         <ScreenHeader title={t("settings.title")} />
 
         <View style={styles.account}>
-          <LinearGradient colors={[...gradients.violet]} style={styles.avatar}>
+          <LinearGradient colors={[...theme.gradient]} style={styles.avatar}>
             <AppText variant="heading" color={colors.textOnGradient}>
               {initial}
             </AppText>
           </LinearGradient>
           <View style={{ flex: 1 }}>
             <AppText variant="bodyStrong" numberOfLines={1}>
-              {email}
+              {shownName}
             </AppText>
             <AppText variant="caption" color={profile ? colors.statusVerified : profileError ? colors.statusError : colors.textSecondary}>
               {t("settings.profile")}: {profile ? t("settings.profileOk") : profileError ? t("settings.profileMissing") : t("settings.profileLoading")}
             </AppText>
           </View>
-          <View style={styles.planChip}>
-            <AppText variant="label" color={colors.violetStart}>
+          <View style={[styles.planChip, { backgroundColor: theme.tint }]}>
+            <AppText variant="label" color={theme.accent}>
               {t("settings.freePlan")}
             </AppText>
           </View>
         </View>
 
-        <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.usage}>
+        <LinearGradient colors={[...theme.gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.usage, { borderRadius: theme.heroRadius }]}>
           <AppText variant="heading" color={colors.textOnGradient}>
             {t("settings.usage")}
           </AppText>
@@ -68,8 +71,16 @@ export default function SettingsScreen() {
           </AppText>
         </View>
 
+        <Pressable onPress={() => router.push("/profile")} accessibilityRole="button" style={styles.row}>
+          <Ionicons name="person-outline" size={20} color={theme.accent} />
+          <AppText variant="bodyStrong" style={{ flex: 1 }}>
+            {t("settings.yourProfile")}
+          </AppText>
+          <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={18} color={colors.textSecondary} />
+        </Pressable>
+
         <Pressable onPress={() => router.push("/status")} accessibilityRole="button" style={styles.row}>
-          <Ionicons name="pulse-outline" size={20} color={colors.violetStart} />
+          <Ionicons name="pulse-outline" size={20} color={theme.accent} />
           <AppText variant="bodyStrong" style={{ flex: 1 }}>
             {t("settings.connection")}
           </AppText>

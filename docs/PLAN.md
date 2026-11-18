@@ -130,11 +130,16 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: i18n with language switch; full RTL layout (RN needs a reload to flip direction); Home with Search, Ask AI, Add Memory, recent-memories list, usage indicator and Settings entries (placeholders OK); `preferred_language` saved on the profile.
   - Test: switch to Arabic from Settings; the whole app flips right-to-left and text is Arabic; switch back; choice survives a relaunch.
 
-- [ ] **M3 — Core schema, security, and manual memories** *(done except the two-account check in the app: steps 1-5 confirmed in Expo Go, database security test passes 11/11)*
+- [ ] **M2b — Personal touch: name, gender, greeting and colour tones** *(added at the owner's request; built and checked locally, waiting for the manual test in Expo Go)*
+  - Build: `display_name` and `gender` (male / female / prefer not to say) on `profiles`, filled from the sign-up form by the existing trigger; sign-up asks for both; Home greets by name and time of day with a sentence that changes daily; Arabic sentences use feminine wording when "female" is chosen; three colour tones (violet = original, rose-violet, indigo-blue) plus a slightly different hero-card roundness; a Your profile screen to edit both; a prompt on Home for older accounts without a name.
+  - Test: sign up as a woman, as a man and as "prefer not to say" and see three tones and a greeting with each name; switch to Arabic and check the wording; edit the profile and watch the colours change.
+  - Privacy note: gender is only ever chosen by the person, never inferred; it is not sent to the AI provider or analytics.
+
+- [x] **M3 — Core schema, security, and manual memories** *(done: steps 1-5 and the two-account check confirmed in Expo Go; database security test passes 11/11)*
   - Build: migrations for `profiles`, `memories`, `memory_evidence`, `memory_files`; RLS on every table; a "pgTAP/SQL" test that user A cannot read or write user B's rows; Memory list, Memory Detail (compact → expanded), manual create/edit; soft delete (sets `deleted_at`, hidden from lists).
   - Test: create a memory by typing it in, see it on Home, open it, edit it, delete it (it disappears). Sign in as a second account and confirm the first account's memories are not visible.
 
-- [ ] **M4 — Add Memory: pick and upload one file** *(built and checked locally: private `temp-uploads` and `originals` buckets, `extraction_jobs` table, `upload` Edge Function (prepare + complete), file and photo pickers with HEIC to JPEG, type/size checks, upload screen in English and Arabic; waiting for the manual test in Expo Go)*
+- [x] **M4 — Add Memory: pick and upload one file** *(done: upload, size/type rejection and private storage confirmed in Expo Go)*
   - Build: Add Memory screen showing the file limits from section 1; picker for photo/screenshot/PDF; client-side type and size checks (HEIC → JPEG); bucket `file_size_limit` and `allowed_mime_types`; signed-URL upload to the private `temp-uploads` bucket; `extraction_jobs` row (`uploaded`); `memory_files` row with `expires_at`.
   - Test: pick a screenshot and see "uploaded"; pick a 30 MB file or a `.zip` and see a specific rejection message; confirm in the Supabase dashboard that the file sits in a private bucket and a direct URL without auth fails.
 

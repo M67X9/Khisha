@@ -7,7 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useI18n } from "../i18n";
 import { AppText } from "./AppText";
-import { colors, gradients, radius } from "./theme";
+import { colors, radius } from "./theme";
+import { useTheme } from "./ThemeProvider";
 
 /**
  * Floating action bar (Figma: Floating Bar): Search, Add Memory, Ask AI.
@@ -15,6 +16,7 @@ import { colors, gradients, radius } from "./theme";
  */
 export function FloatingBar() {
   const { t } = useI18n();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.wrap, { bottom: Math.max(insets.bottom, 12) + 4 }]} pointerEvents="box-none">
@@ -24,7 +26,7 @@ export function FloatingBar() {
           <Ionicons name="search" size={22} color={colors.ink} />
         </Pressable>
         <Pressable onPress={() => router.push("/add")} accessibilityRole="button" accessibilityLabel={t("bar.add")} style={styles.add}>
-          <LinearGradient colors={[...gradients.violet]} style={styles.plus}>
+          <LinearGradient colors={[...theme.gradient]} style={styles.plus}>
             <Ionicons name="add" size={18} color={colors.textOnGradient} />
           </LinearGradient>
           <AppText variant="bodyStrong" color={colors.textOnGradient}>
@@ -32,7 +34,7 @@ export function FloatingBar() {
           </AppText>
         </Pressable>
         <Pressable onPress={() => router.push("/ask")} accessibilityRole="button" accessibilityLabel={t("bar.ask")}>
-          <LinearGradient colors={[...gradients.violet]} style={styles.round}>
+          <LinearGradient colors={[...theme.gradient]} style={styles.round}>
             <Ionicons name="sparkles" size={22} color={colors.textOnGradient} />
           </LinearGradient>
         </Pressable>

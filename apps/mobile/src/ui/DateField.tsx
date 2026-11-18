@@ -8,6 +8,7 @@ import { useI18n } from "../i18n";
 import { fromISODate, toISODate } from "../lib/dates";
 import { AppText } from "./AppText";
 import { colors, radius } from "./theme";
+import { useTheme } from "./ThemeProvider";
 
 type Props = {
   /** "YYYY-MM-DD", or "" when no date is set */
@@ -21,6 +22,7 @@ type Props = {
 /** A date shown as "18 Nov 2026". Tapping it opens a calendar to pick from, so nobody types a date. */
 export function DateField({ value, onChange, label, clearable = false }: Props) {
   const { t, lang, formatDate } = useI18n();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Date>(() => (value ? fromISODate(value) : new Date()));
@@ -74,7 +76,7 @@ export function DateField({ value, onChange, label, clearable = false }: Props) 
                 </AppText>
               </Pressable>
             </View>
-            <DateTimePicker value={draft} mode="date" display="inline" locale={locale} accentColor={colors.violetStart} themeVariant="light" onChange={(_e, d) => d && setDraft(d)} style={styles.picker} />
+            <DateTimePicker value={draft} mode="date" display="inline" locale={locale} accentColor={theme.accent} themeVariant="light" onChange={(_e, d) => d && setDraft(d)} style={styles.picker} />
           </View>
         </Modal>
       )}

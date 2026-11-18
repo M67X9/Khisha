@@ -19,13 +19,10 @@ export async function listMemories(options: { limit?: number; category?: string 
   return (data ?? []) as MemorySummary[];
 }
 
-export async function countMemories(category: string): Promise<number> {
-  const { count, error } = await supabase
-    .from("memories")
-    .select("id", { count: "exact", head: true })
-    .is("deleted_at", null)
-    .eq("status", "confirmed")
-    .eq("category", category);
+export async function countMemories(category?: string): Promise<number> {
+  let query = supabase.from("memories").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("status", "confirmed");
+  if (category) query = query.eq("category", category);
+  const { count, error } = await query;
   if (error) throw new Error(error.message);
   return count ?? 0;
 }

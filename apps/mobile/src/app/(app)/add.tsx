@@ -11,7 +11,8 @@ import { pickDocument, pickPhoto, uploadFile, UploadFailure, type PickedFile, ty
 import { AppText } from "../../ui/AppText";
 import { Button } from "../../ui/Button";
 import { ScreenHeader } from "../../ui/ScreenHeader";
-import { colors, gradients, radius, shadowPanel } from "../../ui/theme";
+import { colors, radius, shadowPanel } from "../../ui/theme";
+import { useTheme } from "../../ui/ThemeProvider";
 
 type Phase = { name: "idle" } | { name: "picked"; file: PickedFile } | { name: "uploading"; file: PickedFile } | { name: "uploaded"; file: PickedFile };
 
@@ -20,6 +21,7 @@ const MB = 1024 * 1024;
 /** Add Memory (Figma: 3 · Add Memory). Pick one file, check it, upload it to private storage. Reading it with AI comes in M5. */
 export default function AddMemoryScreen() {
   const { t, formatNumber } = useI18n();
+  const theme = useTheme();
   const [phase, setPhase] = useState<Phase>({ name: "idle" });
   const [issue, setIssue] = useState<UploadIssue | null>(null);
 
@@ -59,7 +61,7 @@ export default function AddMemoryScreen() {
 
         {phase.name === "idle" && (
           <View style={styles.drop}>
-            <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.badge}>
+            <LinearGradient colors={[...theme.gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.badge}>
               <Ionicons name="cloud-upload-outline" size={32} color={colors.textOnGradient} />
             </LinearGradient>
             <AppText variant="heading" style={{ textAlign: "center" }}>
@@ -119,8 +121,8 @@ export default function AddMemoryScreen() {
 
         {phase.name === "idle" && (
           <>
-            <View style={styles.note}>
-              <Ionicons name="sparkles-outline" size={18} color={colors.violetStart} />
+            <View style={[styles.note, { backgroundColor: theme.tint }]}>
+              <Ionicons name="sparkles-outline" size={18} color={theme.accent} />
               <AppText variant="caption" style={{ flex: 1 }}>
                 {t("upload.credit")}
               </AppText>
@@ -139,13 +141,14 @@ export default function AddMemoryScreen() {
 
 function FileCard({ file }: { file: PickedFile }) {
   const { t } = useI18n();
+  const theme = useTheme();
   return (
     <View style={styles.fileCard}>
       {file.kind === "image" ? (
         <Image source={{ uri: file.uri }} style={styles.thumb} accessibilityIgnoresInvertColors />
       ) : (
-        <View style={[styles.thumb, styles.pdfThumb]}>
-          <Ionicons name="document-text-outline" size={30} color={colors.violetStart} />
+        <View style={[styles.thumb, styles.pdfThumb, { backgroundColor: theme.tint }]}>
+          <Ionicons name="document-text-outline" size={30} color={theme.accent} />
         </View>
       )}
       <View style={{ flex: 1, gap: 2 }}>

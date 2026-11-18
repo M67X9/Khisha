@@ -8,11 +8,13 @@ import { checkHealth, type HealthState } from "../../lib/health";
 import { AppText } from "../../ui/AppText";
 import { Button } from "../../ui/Button";
 import { ScreenHeader } from "../../ui/ScreenHeader";
-import { colors, gradients, radius } from "../../ui/theme";
+import { colors, radius } from "../../ui/theme";
+import { useTheme } from "../../ui/ThemeProvider";
 
 /** Connection check: proves the app can reach the Supabase Edge Function and the database (kept from milestone M0). */
 export default function StatusScreen() {
   const { t } = useI18n();
+  const theme = useTheme();
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
 
   const run = useCallback(async () => {
@@ -42,7 +44,7 @@ export default function StatusScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.page}>
         <ScreenHeader title={t("status.title")} />
-        <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+        <LinearGradient colors={[...theme.gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
           <AppText variant="title" color={colors.textOnGradient}>
             {t("status.title")}
           </AppText>

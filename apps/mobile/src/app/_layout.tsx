@@ -7,6 +7,7 @@ import { I18nProvider, useI18n } from "../i18n";
 import { AuthProvider, useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { useAppFonts } from "../ui/fonts";
+import { ThemeProvider } from "../ui/ThemeProvider";
 import { colors } from "../ui/theme";
 
 /** Keeps the saved profile language in step with the language chosen on this device (this device wins). */
@@ -54,8 +55,10 @@ export default function RootLayout() {
   return (
     <I18nProvider>
       <AuthProvider>
-        <StatusBar style="dark" />
-        <Navigator />
+        <ThemeProvider>
+          <StatusBar style="dark" />
+          <Navigator />
+        </ThemeProvider>
       </AuthProvider>
     </I18nProvider>
   );

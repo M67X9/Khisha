@@ -4,30 +4,58 @@ import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useI18n } from "../../i18n";
+import { useI18n, type MessageKey } from "../../i18n";
+import { useAuth } from "../../lib/auth";
 import { countMemories, listMemories } from "../../lib/memories";
+import { useGenderedT } from "../../lib/useGenderedT";
 import { useLoad } from "../../lib/useLoad";
 import { AppText } from "../../ui/AppText";
 import { CategoryCard } from "../../ui/CategoryCard";
 import { FloatingBar } from "../../ui/FloatingBar";
 import { IconButton } from "../../ui/IconButton";
 import { MemoryRow } from "../../ui/MemoryRow";
-import { colors, gradients, radius, shadowPanel } from "../../ui/theme";
+import { colors, radius, shadowPanel } from "../../ui/theme";
+import { useTheme } from "../../ui/ThemeProvider";
+import { Button } from "../../ui/Button";
+
+type Period = "morning" | "afternoon" | "evening" | "night";
+const GREETINGS: Record<Period, { named: MessageKey; plain: MessageKey }> = {
+  morning: { named: "home.greet.morning", plain: "home.greet.morning.plain" },
+  afternoon: { named: "home.greet.afternoon", plain: "home.greet.afternoon.plain" },
+  evening: { named: "home.greet.evening", plain: "home.greet.evening.plain" },
+  night: { named: "home.greet.night", plain: "home.greet.night.plain" },
+};
+
+function periodOf(hour: number): Period {
+  if (hour >= 5 && hour < 12) return "morning";
+  if (hour >= 12 && hour < 17) return "afternoon";
+  if (hour >= 17 && hour < 22) return "evening";
+  return "night";
+}
 
 /** Home (Figma: 2 · Home). Real data arrives in later milestones; the numbers here are placeholders. */
 export default function HomeScreen() {
   const { t, lang, setLanguage, formatNumber } = useI18n();
+  const gt = useGenderedT();
+  const theme = useTheme();
+  const { profile } = useAuth();
   const { state } = useLoad(async () => {
-    const [recent, receipts, movies] = await Promise.all([listMemories({ limit: 5 }), countMemories("receipt"), countMemories("movie")]);
-    return { recent, receipts, movies };
+    const [recent, receipts, movies, total] = await Promise.all([listMemories({ limit: 5 }), countMemories("receipt"), countMemories("movie"), countMemories()]);
+    return { recent, receipts, movies, total };
   }, []);
+  const name = profile?.display_name?.trim() || null;
+  const now = new Date();
+  const greet = GREETINGS[periodOf(now.getHours())];
+  const greeting = name ? t(greet.named, { name }) : t(greet.plain);
+  // The sentence under the greeting changes day by day, so the app does not repeat itself.
+  const dayIndex = (Math.floor(now.getTime() / 86_400_000) % 3) + 1;
   const data = state.status === "ok" ? state.data : null;
   const wordmark = lang === "ar" ? "خِشّه" : "Khisha";
   const secondary = lang === "ar" ? "Khisha" : "خِشّه";
 
   return (
     <View style={styles.root}>
-      <LinearGradient colors={["rgba(181,139,224,0.38)", "rgba(238,238,240,0)"]} style={styles.glow} pointerEvents="none" />
+      <LinearGradient colors={[theme.glow, "rgba(238,238,240,0)"]} style={styles.glow} pointerEvents="none" />
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
@@ -48,6 +76,27 @@ export default function HomeScreen() {
             </View>
           </View>
 
+          <View style={{ gap: 4 }}>
+            <AppText variant="title" accessibilityRole="header">
+              {greeting}
+            </AppText>
+            {data && (
+              <AppText variant="body" color={colors.textSecondary}>
+                {data.total === 0 ? t("home.sub.empty") : gt(`home.sub.count.${dayIndex}` as "home.sub.count.1", { n: formatNumber(data.total) })}
+              </AppText>
+            )}
+          </View>
+
+          {profile && !name && (
+            <View style={[styles.namePrompt, { backgroundColor: theme.tint }]}>
+              <AppText variant="bodyStrong">{gt("home.nameTitle")}</AppText>
+              <AppText variant="caption" color={colors.textSecondary}>
+                {t("home.nameBody")}
+              </AppText>
+              <Button label={t("home.nameCta")} onPress={() => router.push("/profile")} />
+            </View>
+          )}
+
           <Pressable onPress={() => router.push("/search")} accessibilityRole="search" accessibilityLabel={t("home.search")} style={styles.search}>
             <Ionicons name="search" size={20} color={colors.textSecondary} />
             <AppText variant="body" color={colors.textSecondary}>
@@ -55,7 +104,7 @@ export default function HomeScreen() {
             </AppText>
           </Pressable>
 
-          <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <LinearGradient colors={[...theme.gradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.hero, { borderRadius: theme.heroRadius }]}>
             <LinearGradient colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.3)"]} style={styles.heroScrim} pointerEvents="none" />
             <View style={styles.heroTop}>
               <AppText variant="label" color={colors.textOnGradient} style={{ opacity: 0.92 }}>
@@ -127,6 +176,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bgApp },
+  namePrompt: { borderRadius: radius.md, padding: 16, gap: 10 },
   glow: { position: "absolute", top: 0, left: 0, right: 0, height: 320 },
   safe: { flex: 1 },
   scroll: { padding: 16, gap: 16, paddingBottom: 140 },

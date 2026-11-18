@@ -14,6 +14,7 @@ import { Button } from "../../../../ui/Button";
 import { metaFor } from "../../../../ui/categories";
 import { ScreenHeader } from "../../../../ui/ScreenHeader";
 import { colors, gradients, radius, shadowPanel } from "../../../../ui/theme";
+import { useTheme } from "../../../../ui/ThemeProvider";
 
 const SOURCE_KEYS: Record<string, MessageKey> = {
   manual: "memory.sourceManual",
@@ -25,6 +26,7 @@ const SOURCE_KEYS: Record<string, MessageKey> = {
 /** Memory Detail (Figma: 5 · Memory Detail): a compact summary that expands into more detail. */
 export default function MemoryDetailScreen() {
   const { t, formatDate } = useI18n();
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, reload } = useLoad(() => getMemory(String(id)), [id]);
   const [expanded, setExpanded] = useState(false);
@@ -120,10 +122,10 @@ export default function MemoryDetailScreen() {
               )}
 
               <Pressable onPress={() => setExpanded((e) => !e)} accessibilityRole="button" accessibilityState={{ expanded }} style={styles.toggle}>
-                <AppText variant="label" color={colors.violetStart}>
+                <AppText variant="label" color={theme.accent}>
                   {expanded ? t("memory.showLess") : t("memory.showMore")}
                 </AppText>
-                <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={16} color={colors.violetStart} />
+                <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={16} color={theme.accent} />
               </Pressable>
 
               {expanded && (

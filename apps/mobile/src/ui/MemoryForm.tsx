@@ -9,6 +9,7 @@ import { Button } from "./Button";
 import { metaFor } from "./categories";
 import { DateField } from "./DateField";
 import { colors, radius } from "./theme";
+import { useTheme } from "./ThemeProvider";
 import { fontFamily } from "./typography";
 
 export type MemoryFormValues = { title: string; category: string; date: string; amount: string; notes: string };
@@ -54,6 +55,7 @@ type Props = {
 
 export function MemoryForm({ initial, submitLabel, onSubmit, note }: Props) {
   const { t, lang, isRTL } = useI18n();
+  const theme = useTheme();
   const [values, setValues] = useState<MemoryFormValues>(initial);
   const [errorKey, setErrorKey] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -80,7 +82,7 @@ export function MemoryForm({ initial, submitLabel, onSubmit, note }: Props) {
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {note && (
-          <View style={styles.note}>
+          <View style={[styles.note, { backgroundColor: theme.tint }]}>
             <AppText variant="caption">{note}</AppText>
           </View>
         )}
