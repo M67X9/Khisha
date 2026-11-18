@@ -159,7 +159,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: normalized search column, trigram + full-text index, Search screen with keyword and filters (category, date); no credits charged; excludes soft-deleted rows.
   - Test: search an English word and an Arabic word from saved memories and find both; a typo or alternate Arabic spelling (e.g. أ/ا) still matches; a deleted memory does not show up.
 
-- [ ] **M8 — Ask AI with sources** *(completes the demo success path)*
+- [x] **M8 — Ask AI with sources** *(completes the demo success path; done: confirmed in Expo Go. Credits are not charged yet, that comes in M10.)*
   - Build: `ask` Edge Function; retrieve top-k memories for the user only; prompt that answers from them and labels anything else as general knowledge; save `conversations`, `messages`, `message_sources`; answer UI with clickable source cards linking to Memory Detail and showing the extracted evidence; reserve/settle credit; empty answer = no charge.
   - Test: after saving a receipt, ask "How much was my [store] receipt?" and receive the right amount with a tappable source that opens that memory; ask something not in memory and see it clearly say so rather than invent.
 
