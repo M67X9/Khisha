@@ -66,3 +66,12 @@ export async function getEvidence(memoryId: string): Promise<MemoryEvidence[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as MemoryEvidence[];
 }
+
+export type SearchFilters = { category: string | null; from: string | null; to: string | null };
+
+/** Free-text search over the person's own saved memories. Runs in the database; no AI and no credits. */
+export async function searchMemories(query: string, filters: SearchFilters): Promise<MemorySummary[]> {
+  const { data, error } = await supabase.rpc("search_memories", { q: query, p_category: filters.category, p_from: filters.from, p_to: filters.to, p_limit: 50 });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MemorySummary[];
+}

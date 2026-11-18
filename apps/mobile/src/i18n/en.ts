@@ -258,6 +258,19 @@ export const en = {
   "review.err.unconfirmed": "Confirm each important detail first.",
   "review.err.discard": "Could not discard. Check your connection and try again.",
   "review.err.invalid": "Something looks wrong in the details. Check them and try again.",
+  "search.placeholder": "Search your memories",
+  "search.clear": "Clear search",
+  "search.allCategories": "All",
+  "search.anyTime": "Any time",
+  "search.days7": "7 days",
+  "search.days30": "30 days",
+  "search.thisYear": "This year",
+  "search.results": "{count} found",
+  "search.none": "Nothing found",
+  "search.noneBody": "Try a shorter word, a different spelling, or remove a filter.",
+  "search.empty": "No memories yet",
+  "search.emptyBody": "Saved memories will show up here.",
+  "search.err": "Could not search. Check your connection and try again.",
 } as const;
 
 export type MessageKey = keyof typeof en;
