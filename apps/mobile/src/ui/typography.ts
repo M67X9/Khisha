@@ -2,7 +2,7 @@ import type { Lang } from "../i18n";
 
 type Weight = "400" | "500" | "600";
 
-/** Type scale from the Figma file (Inter for English, Noto Sans Arabic for Arabic). Arabic gets 4px more line height. */
+/** Type scale from the Figma file (Inter for English, Alexandria for Arabic). Arabic gets 4px more line height. */
 export const scale = {
   number: { size: 40, lineHeight: 48, weight: "600" },
   title: { size: 28, lineHeight: 34, weight: "600" },
@@ -18,5 +18,5 @@ export type Variant = keyof typeof scale;
 const NAMES: Record<Weight, string> = { "400": "Regular", "500": "Medium", "600": "SemiBold" };
 
 export function fontFamily(lang: Lang, weight: Weight): string {
-  return `${lang === "ar" ? "NotoSansArabic" : "Inter"}_${weight}${NAMES[weight]}`;
+  return `${lang === "ar" ? "Alexandria" : "Inter"}_${weight}${NAMES[weight]}`;
 }

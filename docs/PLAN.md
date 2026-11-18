@@ -261,7 +261,7 @@ Based on reference apps the owner shared (a finance analytics app for gradient c
 - **Navigation:** no tab bar. A floating pill at the bottom with Search, a prominent Add Memory, and Ask AI. Segmented pill control (black selected pill) for filters and ranges.
 - **Status colours:** verified green `#1F9D6B`, needs-confirmation amber `#D98A1C`, error red `#D64545`. Critical figures awaiting confirmation always show the amber state, never only a colour (also an icon and label).
 
-**Type:** Inter for Latin, Noto Sans Arabic for Arabic (both in Google Fonts and available in Expo). Large numerals for amounts and dates.
+**Type:** Inter for Latin, Alexandria for Arabic (the owner chose Alexandria; both are in Google Fonts and available in Expo). Large numerals for amounts and dates.
 
 **Components to design once:** gradient category card, hero card, white panel, glass button/chip, segmented control, floating bar, memory card (compact → expanded), confirm-field row, evidence chip (source link), usage meter, chat bubble with source cards.
 
