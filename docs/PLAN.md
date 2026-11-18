@@ -151,7 +151,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: top up OpenRouter; set `AI_PROFILE=premium` (Haiku 5.5, Sonnet 5.5 escalation, Gemini 3.8 Flash fallback); turn on the zero-retention provider setting; test PDFs; run the bake-off on ~30 files (10 Arabic receipts, 10 English, 5 mixed, 5 PDFs) and record results in `docs/AI-EVAL.md`.
   - Test: flip the one setting and re-upload the same sample files; extraction quality visibly improves, Arabic fields come back correct, and `docs/AI-EVAL.md` shows the default model reaching ≥ 95% on critical fields (total, date, merchant). Real files are allowed from here on.
 
-- [ ] **M6 — Review before saving, and the original-file choice**
+- [x] **M6 — Review before saving, and the original-file choice** *(done: confirmed in Expo Go)*
   - Build: Review Extraction screen: source preview, editable fields, low-confidence category flag, **explicit confirmation required** for critical figures/dates (Save disabled until confirmed), category picker, manual title/description fallback, keep-original toggle with a category-based default. `finalize` Edge Function: confirmed → memory `confirmed` + evidence marked `verified`; keep → move file to private `originals` bucket; don't keep → delete the temp file after the user confirms.
   - Test: upload a receipt, change a wrong amount, confirm the amount and date, save with "keep original off"; the memory appears on Home and the temp file is gone. Repeat with "keep original on" and see the file in `originals`. Try saving without confirming the amount (blocked).
 
