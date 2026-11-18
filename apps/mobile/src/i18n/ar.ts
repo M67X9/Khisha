@@ -287,4 +287,5 @@ export const ar: Record<MessageKey, string> = {
   "ask.err.timeout": "استغرق الأمر وقتاً طويلاً. حاول مرة أخرى.",
   "ask.err.provider": "المساعد مشغول الآن. حاول بعد قليل.",
   "ask.err.generic": "حدث خطأ. حاول مرة أخرى.",
+  "review.err.gone": "انتهت صلاحية هذه المسودة وتمت إزالتها. أضف الملف مرة أخرى.",
 };

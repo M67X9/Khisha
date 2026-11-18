@@ -21,7 +21,7 @@ async function call<T>(body: Record<string, unknown>, fallback: MessageKey): Pro
       code = "server_error";
     }
   }
-  const key: MessageKey = code === "unconfirmed_critical" ? "review.err.unconfirmed" : code.startsWith("invalid_") ? "review.err.invalid" : code === "network" ? "memory.err.save" : fallback;
+  const key: MessageKey = code === "not_found" ? "review.err.gone" : code === "unconfirmed_critical" ? "review.err.unconfirmed" : code.startsWith("invalid_") ? "review.err.invalid" : code === "network" ? "memory.err.save" : fallback;
   throw new ReviewFailure(key, code);
 }
 

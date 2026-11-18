@@ -289,6 +289,7 @@ export const en = {
   "ask.err.timeout": "That took too long. Try again.",
   "ask.err.provider": "The assistant is busy right now. Try again in a moment.",
   "ask.err.generic": "Something went wrong. Try again.",
+  "review.err.gone": "This draft has expired and was removed. Add the file again.",
 } as const;
 
 export type MessageKey = keyof typeof en;
