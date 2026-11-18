@@ -36,6 +36,8 @@ npm run typecheck
 
 ## Set up Supabase (milestone M0)
 
+The project already exists: **Khisha**, reference `hfijbeuefuiucbtsshwl`, region `eu-central-1` (Frankfurt). The `app_health` migration and the `health` function are deployed to it. To set up a different project:
+
 1. Create a Supabase project and note its reference (the part before `.supabase.co`).
 2. Link and push the database and function:
 
