@@ -14,6 +14,11 @@ const ATTEMPT_KEY = "khisha.rtlAttempt"; // stops a reload loop if the direction
 
 I18nManager.allowRTL(true);
 
+const MONTHS: Record<Lang, string[]> = {
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  ar: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+};
+
 type Params = Record<string, string | number>;
 
 type I18nState = {
@@ -22,6 +27,8 @@ type I18nState = {
   t: (key: MessageKey, params?: Params) => string;
   /** Numbers always use Western digits (0-9), in English and Arabic. */
   formatNumber: (n: number | string) => string;
+  /** "2026-11-12" or an ISO timestamp -> "12 Nov 2026" / "12 نوفمبر 2026" (Western digits). */
+  formatDate: (iso: string) => string;
   setLanguage: (next: Lang) => Promise<void>;
 };
 
@@ -90,7 +97,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       return s;
     };
     const formatNumber = (n: number | string) => String(n);
-    return { lang, isRTL: lang === "ar", t, formatNumber, setLanguage };
+    const formatDate = (iso: string) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+      if (!m) return iso;
+      const month = MONTHS[lang][Number(m[2]) - 1];
+      return month ? `${Number(m[3])} ${month} ${m[1]}` : iso;
+    };
+    return { lang, isRTL: lang === "ar", t, formatNumber, formatDate, setLanguage };
   }, [lang, setLanguage]);
 
   if (!value) return null;

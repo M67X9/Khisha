@@ -5,15 +5,23 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useI18n } from "../../i18n";
+import { countMemories, listMemories } from "../../lib/memories";
+import { useLoad } from "../../lib/useLoad";
 import { AppText } from "../../ui/AppText";
 import { CategoryCard } from "../../ui/CategoryCard";
 import { FloatingBar } from "../../ui/FloatingBar";
 import { IconButton } from "../../ui/IconButton";
+import { MemoryRow } from "../../ui/MemoryRow";
 import { colors, gradients, radius, shadowPanel } from "../../ui/theme";
 
 /** Home (Figma: 2 · Home). Real data arrives in later milestones; the numbers here are placeholders. */
 export default function HomeScreen() {
   const { t, lang, setLanguage, formatNumber } = useI18n();
+  const { state } = useLoad(async () => {
+    const [recent, receipts, movies] = await Promise.all([listMemories({ limit: 5 }), countMemories("receipt"), countMemories("movie")]);
+    return { recent, receipts, movies };
+  }, []);
+  const data = state.status === "ok" ? state.data : null;
   const wordmark = lang === "ar" ? "خِشّه" : "Khisha";
   const secondary = lang === "ar" ? "Khisha" : "خِشّه";
 
@@ -74,30 +82,42 @@ export default function HomeScreen() {
             <AppText variant="heading" accessibilityRole="header">
               {t("home.categories")}
             </AppText>
-            <AppText variant="label" color={colors.textSecondary}>
-              {t("home.seeAll")}
-            </AppText>
+            <Pressable onPress={() => router.push("/memories")} accessibilityRole="button" hitSlop={10}>
+              <AppText variant="label" color={colors.textSecondary}>
+                {t("home.seeAll")}
+              </AppText>
+            </Pressable>
           </View>
           <View style={styles.cards}>
-            <CategoryCard tone="coral" icon="receipt-outline" title={t("cat.receipts")} subtitle={t("cat.count", { n: formatNumber(0) })} />
-            <CategoryCard tone="violet" icon="film-outline" title={t("cat.movies")} subtitle={t("cat.count", { n: formatNumber(0) })} />
+            <CategoryCard tone="coral" icon="receipt-outline" title={t("cat.receipts")} subtitle={t("cat.count", { n: formatNumber(data?.receipts ?? 0) })} onPress={() => router.push("/memories?category=receipt")} />
+            <CategoryCard tone="violet" icon="film-outline" title={t("cat.movies")} subtitle={t("cat.count", { n: formatNumber(data?.movies ?? 0) })} onPress={() => router.push("/memories?category=movie")} />
           </View>
 
           <View style={styles.sectionHeader}>
             <AppText variant="heading" accessibilityRole="header">
               {t("home.recent")}
             </AppText>
-            <AppText variant="label" color={colors.textSecondary}>
-              {t("home.seeAll")}
-            </AppText>
+            <Pressable onPress={() => router.push("/memories")} accessibilityRole="button" hitSlop={10}>
+              <AppText variant="label" color={colors.textSecondary}>
+                {t("home.seeAll")}
+              </AppText>
+            </Pressable>
           </View>
-          <View style={styles.empty}>
-            <Ionicons name="documents-outline" size={28} color={colors.textSecondary} />
-            <AppText variant="bodyStrong">{t("home.emptyTitle")}</AppText>
-            <AppText variant="caption" color={colors.textSecondary} style={{ textAlign: "center" }}>
-              {t("home.emptyBody")}
-            </AppText>
-          </View>
+          {data && data.recent.length > 0 ? (
+            <View style={{ gap: 10 }}>
+              {data.recent.map((m) => (
+                <MemoryRow key={m.id} memory={m} />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.empty}>
+              <Ionicons name="documents-outline" size={28} color={colors.textSecondary} />
+              <AppText variant="bodyStrong">{t("home.emptyTitle")}</AppText>
+              <AppText variant="caption" color={colors.textSecondary} style={{ textAlign: "center" }}>
+                {t("home.emptyBody")}
+              </AppText>
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
       <FloatingBar />
