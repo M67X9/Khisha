@@ -122,7 +122,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: monorepo; Supabase project (dev); a `health` Edge Function that checks the DB; OpenRouter key stored as a Supabase secret; Next.js placeholder site deployed to Vercel; Expo app running in Expo Go (iOS simulator, or a phone on the same Wi-Fi).
   - Test: open the app in Expo Go; a status screen shows "Edge Function ✓ · Database ✓" fetched from the deployed function; the Vercel URL loads in a browser.
 
-- [ ] **M1 — Email/password sign-in**
+- [ ] **M1 — Email/password sign-in** *(built and checked locally: `profiles` table + trigger + RLS applied to the Khisha project, sign-in / sign-up / sign-out screens, session kept in the Keychain; waiting for the manual test in Expo Go)*
   - Build: Supabase Auth; register, sign in, sign out, clear error messages; session persists in secure storage; `profiles` row auto-created by trigger.
   - Test: register a new account, force-quit and reopen the app (still signed in), sign out (back at sign-in), sign in with a wrong password (readable error).
 

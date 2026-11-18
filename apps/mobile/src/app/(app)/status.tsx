@@ -1,9 +1,10 @@
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { checkHealth, type HealthState } from "../lib/health";
+import { checkHealth, type HealthState } from "../../lib/health";
 
 /** M0 status screen: proves the app can reach the Supabase Edge Function and the database. */
 export default function StatusScreen() {
@@ -24,6 +25,9 @@ export default function StatusScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.page}>
+        <Pressable onPress={() => router.back()} accessibilityRole="button" hitSlop={10}>
+          <Text style={styles.back}>‹ Back</Text>
+        </Pressable>
         <LinearGradient colors={["#5B3FB0", "#B58BE0"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
           <Text style={styles.arabic}>خِشّه</Text>
           <Text style={styles.brand}>Khisha</Text>
@@ -69,6 +73,7 @@ function Row({ label, state }: { label: string; state: "loading" | "ok" | "fail"
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#EEEEF0" },
   page: { flex: 1, padding: 16, gap: 16 },
+  back: { fontSize: 16, fontWeight: "600", color: "#111114" },
   hero: { borderRadius: 28, padding: 24, gap: 4 },
   arabic: { color: "#fff", fontSize: 40, fontWeight: "600" },
   brand: { color: "#fff", fontSize: 28, fontWeight: "600" },
