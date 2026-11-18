@@ -40,3 +40,15 @@ export type MemoryInput = {
   document_date: string | null;
   structured_fields: StructuredFields;
 };
+
+/** A row of `public.memory_evidence`: one fact read from a file, with how sure the reader was. */
+export type MemoryEvidence = {
+  id: string;
+  memory_id: string;
+  field_key: string;
+  value: string | null;
+  source: "file" | "user_correction" | "external" | "manual";
+  is_critical: boolean;
+  confidence: number | null;
+  confirmed_at: string | null;
+};

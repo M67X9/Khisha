@@ -2,11 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { MAX_IMAGE_BYTES, MAX_PDF_BYTES, MAX_PDF_PAGES } from "@khisha/shared";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useI18n } from "../../i18n";
+import { ExtractFailure, startExtraction, waitForExtraction } from "../../lib/extract";
 import { pickDocument, pickPhoto, uploadFile, UploadFailure, type PickedFile, type PickResult, type UploadIssue } from "../../lib/upload";
 import { AppText } from "../../ui/AppText";
 import { Button } from "../../ui/Button";
@@ -14,16 +15,33 @@ import { ScreenHeader } from "../../ui/ScreenHeader";
 import { colors, radius, shadowPanel } from "../../ui/theme";
 import { useTheme } from "../../ui/ThemeProvider";
 
-type Phase = { name: "idle" } | { name: "picked"; file: PickedFile } | { name: "uploading"; file: PickedFile } | { name: "uploaded"; file: PickedFile };
+type Phase =
+  | { name: "idle" }
+  | { name: "picked"; file: PickedFile }
+  | { name: "uploading"; file: PickedFile }
+  | { name: "extracting"; file: PickedFile; jobId: string }
+  | { name: "extractFailed"; file: PickedFile; jobId: string };
 
 const MB = 1024 * 1024;
 
-/** Add Memory (Figma: 3 · Add Memory). Pick one file, check it, upload it to private storage. Reading it with AI comes in M5. */
+/**
+ * Add Memory (Figma: 3 · Add Memory). Pick one file, check it, upload it to private storage, then let the AI read it
+ * into a draft memory. The review-and-save step comes in milestone M6.
+ */
 export default function AddMemoryScreen() {
   const { t, formatNumber } = useI18n();
   const theme = useTheme();
   const [phase, setPhase] = useState<Phase>({ name: "idle" });
   const [issue, setIssue] = useState<UploadIssue | null>(null);
+  const control = useRef({ cancelled: false });
+
+  // If the person leaves this screen, stop waiting (the server keeps working; the draft is created either way).
+  useEffect(() => {
+    const c = control.current;
+    return () => {
+      c.cancelled = true;
+    };
+  }, []);
 
   const handlePick = async (picker: () => Promise<PickResult>) => {
     const result = await picker();
@@ -33,12 +51,26 @@ export default function AddMemoryScreen() {
     setPhase({ name: "picked", file: result.file });
   };
 
+  const read = async (file: PickedFile, jobId: string) => {
+    setIssue(null);
+    setPhase({ name: "extracting", file, jobId });
+    try {
+      await startExtraction(jobId);
+      const { memoryId } = await waitForExtraction(jobId, control.current);
+      if (!control.current.cancelled) router.replace(`/memory/${memoryId}`);
+    } catch (e) {
+      if (control.current.cancelled) return;
+      setIssue(e instanceof ExtractFailure ? e.issue : { key: "extract.err.generic" });
+      setPhase({ name: "extractFailed", file, jobId });
+    }
+  };
+
   const upload = async (file: PickedFile) => {
     setIssue(null);
     setPhase({ name: "uploading", file });
     try {
-      await uploadFile(file);
-      setPhase({ name: "uploaded", file });
+      const { jobId } = await uploadFile(file);
+      await read(file, jobId);
     } catch (e) {
       setIssue(e instanceof UploadFailure ? e.issue : { key: "upload.err.server" });
       setPhase({ name: "picked", file }); // keep the file so the person can try again
@@ -52,7 +84,7 @@ export default function AddMemoryScreen() {
 
   const limits = t("upload.limits", { image: formatNumber(MAX_IMAGE_BYTES / MB), pdf: formatNumber(MAX_PDF_BYTES / MB), pages: formatNumber(MAX_PDF_PAGES) });
   const file = phase.name === "idle" ? null : phase.file;
-  const busy = phase.name === "uploading";
+  const uploading = phase.name === "uploading";
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -73,18 +105,16 @@ export default function AddMemoryScreen() {
           </View>
         )}
 
-        {file && phase.name !== "uploaded" && <FileCard file={file} />}
+        {file && <FileCard file={file} />}
 
-        {phase.name === "uploaded" && (
-          <View style={styles.success}>
-            <View style={styles.check}>
-              <Ionicons name="checkmark" size={26} color={colors.statusVerified} />
-            </View>
+        {phase.name === "extracting" && (
+          <View style={styles.reading}>
+            <ActivityIndicator size="large" color={theme.accent} />
             <AppText variant="heading" style={{ textAlign: "center" }}>
-              {t("upload.doneTitle")}
+              {t("extract.reading")}
             </AppText>
             <AppText variant="body" color={colors.textSecondary} style={{ textAlign: "center" }}>
-              {t("upload.doneBody")}
+              {t("extract.readingBody")}
             </AppText>
           </View>
         )}
@@ -107,15 +137,20 @@ export default function AddMemoryScreen() {
 
         {(phase.name === "picked" || phase.name === "uploading") && (
           <>
-            <Button label={busy ? t("upload.uploading") : issue ? t("memory.retry") : t("upload.upload")} onPress={() => upload(phase.file)} loading={busy} />
-            <Button label={t("upload.another")} variant="secondary" onPress={reset} disabled={busy} />
+            <Button label={uploading ? t("upload.uploading") : issue ? t("memory.retry") : t("upload.upload")} onPress={() => upload(phase.file)} loading={uploading} />
+            <Button label={t("upload.another")} variant="secondary" onPress={reset} disabled={uploading} />
           </>
         )}
 
-        {phase.name === "uploaded" && (
+        {phase.name === "extractFailed" && (
           <>
-            <Button label={t("upload.done")} onPress={() => router.back()} />
+            <Button label={t("extract.retry")} onPress={() => read(phase.file, phase.jobId)} />
             <Button label={t("upload.another")} variant="secondary" onPress={reset} />
+            <Pressable onPress={() => router.replace("/add-manual")} accessibilityRole="button" style={styles.manual}>
+              <AppText variant="label" color={colors.textSecondary}>
+                {t("upload.manual")}
+              </AppText>
+            </Pressable>
           </>
         )}
 
@@ -170,10 +205,9 @@ const styles = StyleSheet.create({
   badge: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center" },
   fileCard: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.surface, borderRadius: radius.md, padding: 12, ...shadowPanel },
   thumb: { width: 72, height: 72, borderRadius: 14, backgroundColor: colors.bgApp },
-  pdfThumb: { alignItems: "center", justifyContent: "center", backgroundColor: colors.tintViolet },
-  success: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 24, gap: 10, alignItems: "center" },
-  check: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.tintVerified, alignItems: "center", justifyContent: "center" },
+  pdfThumb: { alignItems: "center", justifyContent: "center" },
+  reading: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 24, gap: 12, alignItems: "center" },
   issue: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(194,54,54,0.10)", borderRadius: radius.md, padding: 14 },
-  note: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.tintViolet, borderRadius: radius.md, padding: 14 },
+  note: { flexDirection: "row", alignItems: "center", gap: 10, borderRadius: radius.md, padding: 14 },
   manual: { alignItems: "center", paddingVertical: 8 },
 });

@@ -1,4 +1,4 @@
-import type { Memory, MemoryInput, MemorySummary } from "@khisha/shared";
+import type { Memory, MemoryEvidence, MemoryInput, MemorySummary } from "@khisha/shared";
 
 import { supabase } from "./supabase";
 
@@ -53,4 +53,16 @@ export async function updateMemory(id: string, input: MemoryInput): Promise<void
 export async function softDeleteMemory(id: string): Promise<void> {
   const { error } = await supabase.from("memories").update({ deleted_at: new Date().toISOString() }).eq("id", id);
   if (error) throw new Error(error.message);
+}
+
+/** The facts the AI reader found in the file, important ones first. */
+export async function getEvidence(memoryId: string): Promise<MemoryEvidence[]> {
+  const { data, error } = await supabase
+    .from("memory_evidence")
+    .select("id,memory_id,field_key,value,source,is_critical,confidence,confirmed_at")
+    .eq("memory_id", memoryId)
+    .order("is_critical", { ascending: false })
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MemoryEvidence[];
 }

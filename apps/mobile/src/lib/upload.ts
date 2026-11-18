@@ -147,7 +147,7 @@ async function callUpload<T>(body: Record<string, unknown>, file: PickedFile): P
  * 1) ask the server for permission and a one-time upload token, 2) send the bytes, 3) ask the server to verify them.
  * The server re-checks the type and size, so the checks on the phone are only a convenience.
  */
-export async function uploadFile(file: PickedFile): Promise<{ fileId: string; jobId: string | null }> {
+export async function uploadFile(file: PickedFile): Promise<{ fileId: string; jobId: string }> {
   const prepared = await callUpload<{ file_id: string; job_id: string; path: string; token: string }>(
     { action: "prepare", filename: file.name, mime_type: file.mimeType, size_bytes: file.size },
     file,
@@ -164,5 +164,5 @@ export async function uploadFile(file: PickedFile): Promise<{ fileId: string; jo
   if (error) throw new UploadFailure(/exceed|too large|size/i.test(error.message) ? issueForServerCode("too_large", file) : { key: "upload.err.network" });
 
   const done = await callUpload<{ file_id: string; job_id: string | null }>({ action: "complete", file_id: prepared.file_id }, file);
-  return { fileId: done.file_id, jobId: done.job_id };
+  return { fileId: done.file_id, jobId: done.job_id ?? prepared.job_id };
 }

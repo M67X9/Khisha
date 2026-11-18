@@ -5,9 +5,11 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import type { MemoryEvidence } from "@khisha/shared";
+
 import { useI18n, type MessageKey } from "../../../../i18n";
 import { formatAmount } from "../../../../lib/format";
-import { getMemory, softDeleteMemory } from "../../../../lib/memories";
+import { getEvidence, getMemory, softDeleteMemory } from "../../../../lib/memories";
 import { useLoad } from "../../../../lib/useLoad";
 import { AppText } from "../../../../ui/AppText";
 import { Button } from "../../../../ui/Button";
@@ -28,7 +30,13 @@ export default function MemoryDetailScreen() {
   const { t, formatDate } = useI18n();
   const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, reload } = useLoad(() => getMemory(String(id)), [id]);
+  const { state, reload } = useLoad(async () => {
+    const memory = await getMemory(String(id));
+    if (!memory) return null;
+    // The facts the AI reader found; if they cannot be loaded the memory still opens.
+    const evidence = await getEvidence(String(id)).catch((): MemoryEvidence[] => []);
+    return { memory, evidence };
+  }, [id]);
   const [expanded, setExpanded] = useState(false);
 
   const confirmDelete = () => {
@@ -66,7 +74,8 @@ export default function MemoryDetailScreen() {
         {state.status === "ok" && state.data === null && <AppText variant="body">{t("memory.notFound")}</AppText>}
 
         {state.status === "ok" && state.data && (() => {
-          const m = state.data;
+          const m = state.data.memory;
+          const evidence = state.data.evidence;
           const meta = metaFor(m.category);
           const amount = formatAmount(t, m.structured_fields);
           const date = m.document_date ? formatDate(m.document_date) : null;
@@ -99,6 +108,18 @@ export default function MemoryDetailScreen() {
                 </View>
               </LinearGradient>
 
+              {m.status === "draft" && (
+                <View style={[styles.draft, { backgroundColor: theme.tint }]}>
+                  <View style={styles.draftTitle}>
+                    <Ionicons name="sparkles" size={16} color={theme.accent} />
+                    <AppText variant="label" color={theme.accent}>
+                      {t("draft.banner")}
+                    </AppText>
+                  </View>
+                  <AppText variant="caption">{t("draft.bannerBody")}</AppText>
+                </View>
+              )}
+
               <View style={[styles.pill, verified ? styles.pillOk : styles.pillNeutral]}>
                 <Ionicons name={verified ? "checkmark" : "information-circle-outline"} size={14} color={verified ? colors.statusVerified : colors.textSecondary} />
                 <AppText variant="label" color={verified ? colors.statusVerified : colors.textSecondary}>
@@ -118,6 +139,17 @@ export default function MemoryDetailScreen() {
                     {t("memory.notes")}
                   </AppText>
                   <AppText variant="body">{m.notes}</AppText>
+                </View>
+              )}
+
+              {evidence.length > 0 && (
+                <View style={styles.panel}>
+                  <AppText variant="label" color={colors.textSecondary}>
+                    {t("evidence.title")}
+                  </AppText>
+                  {evidence.map((ev) => (
+                    <EvidenceRow key={ev.id} evidence={ev} />
+                  ))}
                 </View>
               )}
 
@@ -165,6 +197,45 @@ export default function MemoryDetailScreen() {
   );
 }
 
+const EVIDENCE_LABELS: Record<string, MessageKey> = {
+  total: "evidence.total",
+  date: "evidence.date",
+  event_date: "evidence.event_date",
+  merchant: "evidence.merchant",
+};
+
+/** One fact from the file, with a flag when it still needs the person's confirmation or the reader was unsure. */
+function EvidenceRow({ evidence }: { evidence: MemoryEvidence }) {
+  const { t } = useI18n();
+  const known = EVIDENCE_LABELS[evidence.field_key];
+  const label = known ? t(known) : evidence.field_key.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+  const needsConfirm = evidence.is_critical && !evidence.confirmed_at;
+  const low = evidence.confidence !== null && evidence.confidence < 0.7;
+  return (
+    <View style={{ gap: 6 }}>
+      <KeyValue label={label} value={evidence.value ?? ""} />
+      {(needsConfirm || low) && (
+        <View style={styles.flags}>
+          {needsConfirm && (
+            <View style={[styles.flag, styles.flagConfirm]}>
+              <AppText variant="caption" color={colors.statusConfirm}>
+                {t("evidence.needsConfirm")}
+              </AppText>
+            </View>
+          )}
+          {low && (
+            <View style={[styles.flag, styles.flagLow]}>
+              <AppText variant="caption" color={colors.statusError}>
+                {t("evidence.lowConfidence")}
+              </AppText>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function KeyValue({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.kv}>
@@ -187,6 +258,12 @@ const styles = StyleSheet.create({
   pill: { alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill },
   pillOk: { backgroundColor: colors.tintVerified },
   pillNeutral: { backgroundColor: "rgba(107,107,118,0.13)" },
+  draft: { borderRadius: radius.md, padding: 14, gap: 4 },
+  draftTitle: { flexDirection: "row", alignItems: "center", gap: 6 },
+  flags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  flag: { borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 },
+  flagConfirm: { backgroundColor: "rgba(168,95,0,0.12)" },
+  flagLow: { backgroundColor: "rgba(194,54,54,0.10)" },
   panel: { backgroundColor: colors.surface, borderRadius: radius.md, padding: 16, gap: 12, ...shadowPanel },
   kv: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 },
   toggle: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start" },
