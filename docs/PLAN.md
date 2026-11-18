@@ -155,7 +155,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: Review Extraction screen: source preview, editable fields, low-confidence category flag, **explicit confirmation required** for critical figures/dates (Save disabled until confirmed), category picker, manual title/description fallback, keep-original toggle with a category-based default. `finalize` Edge Function: confirmed → memory `confirmed` + evidence marked `verified`; keep → move file to private `originals` bucket; don't keep → delete the temp file after the user confirms.
   - Test: upload a receipt, change a wrong amount, confirm the amount and date, save with "keep original off"; the memory appears on Home and the temp file is gone. Repeat with "keep original on" and see the file in `originals`. Try saving without confirming the amount (blocked).
 
-- [ ] **M7 — Search**
+- [x] **M7 — Search** *(done: confirmed in Expo Go)*
   - Build: normalized search column, trigram + full-text index, Search screen with keyword and filters (category, date); no credits charged; excludes soft-deleted rows.
   - Test: search an English word and an Arabic word from saved memories and find both; a typo or alternate Arabic spelling (e.g. أ/ا) still matches; a deleted memory does not show up.
 
