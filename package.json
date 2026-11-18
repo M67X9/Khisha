@@ -1,0 +1,15 @@
+{
+  "name": "khisha",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Khisha (خِشّه): iPhone-first personal AI memory assistant",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start -w @khisha/mobile",
+    "web": "npm run dev -w @khisha/web",
+    "typecheck": "npm run typecheck -w @khisha/shared && npm run typecheck -w @khisha/mobile && npm run typecheck -w @khisha/web"
+  }
+}

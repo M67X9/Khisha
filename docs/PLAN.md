@@ -118,7 +118,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Test: open the Figma file and click through the prototype from Sign in to a sourced answer; flip to the Arabic Home and see the layout mirrored.
   - Figma file: https://www.figma.com/design/lZ6CJFakCdd5gx2UWAESnC (pages: Foundations, Components, Screens). Designed so far: Sign in, Home (EN + AR), Add Memory, Review Extraction, Memory Detail, Ask AI, Search, Memories (Categories and Collections), Settings with usage, Plans (simulated payments), a 3-step Welcome walkthrough, and Recently Deleted. Arabic (RTL) versions of all of these now sit in a second row of the Screens page (cloned and mirrored from the English screens, so future design changes must be applied to both). Preferences and PDF Export Preview are designed too (EN and AR), so every screen in the PRD's screen list now has a design. Native-speaker review of the Arabic text is still needed.
 
-- [ ] **M0 — Foundations and a live "hello"**
+- [ ] **M0 — Foundations and a live "hello"** *(in progress: monorepo, Expo app, Next.js site, shared package, `health` function and migration are written and build locally; still to do: create the Supabase project, push the migration, deploy the function, deploy the site to Vercel, then test in Expo Go)*
   - Build: monorepo; Supabase project (dev); a `health` Edge Function that checks the DB; OpenRouter key stored as a Supabase secret; Next.js placeholder site deployed to Vercel; Expo app running in Expo Go (iOS simulator, or a phone on the same Wi-Fi).
   - Test: open the app in Expo Go; a status screen shows "Edge Function ✓ · Database ✓" fetched from the deployed function; the Vercel URL loads in a browser.
 
