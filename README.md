@@ -58,4 +58,4 @@ npx supabase secrets set OPENROUTER_API_KEY=your-key-here
 
 ## Deploy the website (Vercel)
 
-Import the repository in Vercel and set the **Root Directory** to `apps/web`.
+The site is live at https://khisha-web.vercel.app (Vercel project `khisha-web`, team `m68`). It was deployed directly from `apps/web` because the repository has no remote yet. Once the repository is on GitHub, connect it in Vercel and set the **Root Directory** to `apps/web` so every push deploys.
