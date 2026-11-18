@@ -66,7 +66,7 @@ export const ar: Record<MessageKey, string> = {
   "settings.language": "اللغة",
   "settings.langEnglish": "English",
   "settings.langArabic": "العربية",
-  "settings.langNote": "يُعاد تشغيل التطبيق عند تغيير اتجاه القراءة.",
+  "settings.langNote": "العربية تعرض التطبيق كاملاً من اليمين إلى اليسار.",
   "settings.connection": "فحص الاتصال",
   "settings.signOut": "تسجيل الخروج",
   "settings.profile": "الملف الشخصي",
@@ -205,6 +205,4 @@ export const ar: Record<MessageKey, string> = {
   "profile.saved": "تم الحفظ",
   "profile.err.name": "أدخل اسمك (حتى 60 حرفاً).",
   "profile.err.save": "تعذر الحفظ. تحقق من اتصالك وحاول مرة أخرى.",
-  "direction.banner": "لعرض التطبيق من اليمين إلى اليسار يلزم إعادة تشغيله.",
-  "direction.restart": "إعادة التشغيل",
 };

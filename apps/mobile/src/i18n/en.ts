@@ -64,7 +64,7 @@ export const en = {
   "settings.language": "Language",
   "settings.langEnglish": "English",
   "settings.langArabic": "العربية",
-  "settings.langNote": "The app restarts when the reading direction changes.",
+  "settings.langNote": "Arabic shows the whole app right to left.",
   "settings.connection": "Connection check",
   "settings.signOut": "Sign out",
   "settings.profile": "Profile",
@@ -206,8 +206,6 @@ export const en = {
   "profile.saved": "Saved",
   "profile.err.name": "Enter your name (up to 60 characters).",
   "profile.err.save": "Could not save. Check your connection and try again.",
-  "direction.banner": "To show the app right to left, it needs to restart.",
-  "direction.restart": "Restart",
 } as const;
 
 export type MessageKey = keyof typeof en;

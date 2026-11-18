@@ -21,7 +21,7 @@ type Props = {
 
 /** A date shown as "18 Nov 2026". Tapping it opens a calendar to pick from, so nobody types a date. */
 export function DateField({ value, onChange, label, clearable = false }: Props) {
-  const { t, lang, formatDate } = useI18n();
+  const { t, lang, formatDate, isRTL } = useI18n();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
@@ -59,6 +59,7 @@ export function DateField({ value, onChange, label, clearable = false }: Props) 
 
       {Platform.OS === "ios" && (
         <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
+          <View style={{ flex: 1, direction: isRTL ? "rtl" : "ltr" }}>
           <Pressable style={styles.backdrop} onPress={() => setOpen(false)} accessibilityLabel={t("memory.cancel")} />
           <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
             <View style={styles.sheetHeader}>
@@ -77,6 +78,7 @@ export function DateField({ value, onChange, label, clearable = false }: Props) 
               </Pressable>
             </View>
             <DateTimePicker value={draft} mode="date" display="inline" locale={locale} accentColor={theme.accent} themeVariant="light" onChange={(_e, d) => d && setDraft(d)} style={styles.picker} />
+          </View>
           </View>
         </Modal>
       )}

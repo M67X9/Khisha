@@ -51,15 +51,23 @@ function Navigator() {
   );
 }
 
+/** Lays the whole app out right to left in Arabic and left to right in English. Every screen below inherits it. */
+function DirectionRoot({ children }: { children: React.ReactNode }) {
+  const { isRTL } = useI18n();
+  return <View style={{ flex: 1, direction: isRTL ? "rtl" : "ltr" }}>{children}</View>;
+}
+
 export default function RootLayout() {
   return (
     <I18nProvider>
-      <AuthProvider>
-        <ThemeProvider>
-          <StatusBar style="dark" />
-          <Navigator />
-        </ThemeProvider>
-      </AuthProvider>
+      <DirectionRoot>
+        <AuthProvider>
+          <ThemeProvider>
+            <StatusBar style="dark" />
+            <Navigator />
+          </ThemeProvider>
+        </AuthProvider>
+      </DirectionRoot>
     </I18nProvider>
   );
 }

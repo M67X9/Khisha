@@ -7,7 +7,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useI18n, type Lang } from "../../i18n";
 import { useAuth } from "../../lib/auth";
 import { AppText } from "../../ui/AppText";
-import { DirectionBanner } from "../../ui/DirectionBanner";
 import { Button } from "../../ui/Button";
 import { ScreenHeader } from "../../ui/ScreenHeader";
 import { colors, radius, shadowPanel } from "../../ui/theme";
@@ -26,7 +25,6 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <ScreenHeader title={t("settings.title")} />
-        <DirectionBanner />
 
         <View style={styles.account}>
           <LinearGradient colors={[...theme.gradient]} style={styles.avatar}>

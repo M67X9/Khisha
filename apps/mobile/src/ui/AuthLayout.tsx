@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useI18n } from "../i18n";
 import { AppText } from "./AppText";
-import { DirectionBanner } from "./DirectionBanner";
 import { LanguageChip } from "./LanguageChip";
 import { colors } from "./theme";
 import { useTheme } from "./ThemeProvider";
@@ -37,7 +36,6 @@ export function AuthLayout({ title, children }: { title: string; children: React
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" bounces={false}>
           <View style={styles.sheet}>
-            <DirectionBanner />
             <AppText variant="title">{title}</AppText>
             {children}
           </View>

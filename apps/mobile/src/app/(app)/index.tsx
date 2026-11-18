@@ -11,7 +11,6 @@ import { useGenderedT } from "../../lib/useGenderedT";
 import { useLoad } from "../../lib/useLoad";
 import { AppText } from "../../ui/AppText";
 import { CategoryCard } from "../../ui/CategoryCard";
-import { DirectionBanner } from "../../ui/DirectionBanner";
 import { FloatingBar } from "../../ui/FloatingBar";
 import { IconButton } from "../../ui/IconButton";
 import { MemoryRow } from "../../ui/MemoryRow";
@@ -59,7 +58,6 @@ export default function HomeScreen() {
       <LinearGradient colors={[theme.glow, "rgba(238,238,240,0)"]} style={styles.glow} pointerEvents="none" />
       <SafeAreaView edges={["top"]} style={styles.safe}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <DirectionBanner />
           <View style={styles.header}>
             <View>
               <View style={styles.nameRow}>
