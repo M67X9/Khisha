@@ -3,15 +3,20 @@ import { useState } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
 
 import { useI18n, type MessageKey } from "../i18n";
+import { todayISO } from "../lib/dates";
 import { AppText } from "./AppText";
 import { Button } from "./Button";
 import { metaFor } from "./categories";
+import { DateField } from "./DateField";
 import { colors, radius } from "./theme";
 import { fontFamily } from "./typography";
 
 export type MemoryFormValues = { title: string; category: string; date: string; amount: string; notes: string };
 
-export const emptyMemoryForm: MemoryFormValues = { title: "", category: "receipt", date: "", amount: "", notes: "" };
+/** A new memory starts with today's date. */
+export function emptyMemoryForm(): MemoryFormValues {
+  return { title: "", category: "receipt", date: todayISO(), amount: "", notes: "" };
+}
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -109,7 +114,7 @@ export function MemoryForm({ initial, submitLabel, onSubmit, note }: Props) {
           <AppText variant="label" color={colors.textSecondary}>
             {t("memory.fieldDate")}
           </AppText>
-          <TextInput accessibilityLabel={t("memory.fieldDate")} style={inputStyle} value={values.date} onChangeText={(date) => set({ date })} placeholder={t("memory.datePlaceholder")} placeholderTextColor={colors.textSecondary} keyboardType="numbers-and-punctuation" maxLength={10} />
+          <DateField label={t("memory.fieldDate")} value={values.date} onChange={(date) => set({ date })} clearable />
         </View>
 
         <View style={styles.group}>

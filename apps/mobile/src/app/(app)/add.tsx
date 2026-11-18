@@ -17,7 +17,7 @@ export default function AddMemoryScreen() {
         <ScreenHeader title={t("memory.addTitle")} />
       </View>
       <MemoryForm
-        initial={emptyMemoryForm}
+        initial={emptyMemoryForm()}
         submitLabel={t("memory.save")}
         note={t("memory.manualNote")}
         onSubmit={async (input) => {
