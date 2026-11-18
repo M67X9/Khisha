@@ -205,4 +205,6 @@ export const ar: Record<MessageKey, string> = {
   "profile.saved": "تم الحفظ",
   "profile.err.name": "أدخل اسمك (حتى 60 حرفاً).",
   "profile.err.save": "تعذر الحفظ. تحقق من اتصالك وحاول مرة أخرى.",
+  "direction.banner": "لعرض التطبيق من اليمين إلى اليسار يلزم إعادة تشغيله.",
+  "direction.restart": "إعادة التشغيل",
 };

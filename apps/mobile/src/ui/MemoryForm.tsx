@@ -54,14 +54,14 @@ type Props = {
 };
 
 export function MemoryForm({ initial, submitLabel, onSubmit, note }: Props) {
-  const { t, lang, isRTL } = useI18n();
+  const { t, lang, isRTL, isArabic } = useI18n();
   const theme = useTheme();
   const [values, setValues] = useState<MemoryFormValues>(initial);
   const [errorKey, setErrorKey] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
   const set = (patch: Partial<MemoryFormValues>) => setValues((v) => ({ ...v, ...patch }));
 
-  const inputStyle = [styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: "left" as const, writingDirection: (isRTL ? "rtl" : "ltr") as "rtl" | "ltr" }];
+  const inputStyle = [styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: (isRTL ? "right" : "left") as "left" | "right", writingDirection: (isArabic ? "rtl" : "ltr") as "rtl" | "ltr" }];
 
   const submit = async () => {
     if (busy) return;

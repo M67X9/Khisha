@@ -20,7 +20,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_NAME_LENGTH = 60;
 
 export default function SignUpScreen() {
-  const { t, lang, isRTL, formatNumber } = useI18n();
+  const { t, lang, isRTL, isArabic, formatNumber } = useI18n();
   const { signUp } = useAuth();
   const theme = useTheme();
   const [name, setName] = useState("");
@@ -71,7 +71,7 @@ export default function SignUpScreen() {
       <View style={styles.nameField}>
         <TextInput
           accessibilityLabel={t("auth.name")}
-          style={[styles.nameInput, { fontFamily: fontFamily(lang, "400"), textAlign: "left", writingDirection: isRTL ? "rtl" : "ltr" }]}
+          style={[styles.nameInput, { fontFamily: fontFamily(lang, "400"), textAlign: isRTL ? "right" : "left", writingDirection: isArabic ? "rtl" : "ltr" }]}
           value={name}
           onChangeText={setName}
           placeholder={t("auth.name")}

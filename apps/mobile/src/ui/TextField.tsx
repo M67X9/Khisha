@@ -15,7 +15,7 @@ type Props = Pick<TextInputProps, "value" | "onChangeText" | "placeholder" | "ke
 };
 
 export function TextField({ icon, secure = false, accessibilityLabel, ...input }: Props) {
-  const { lang, isRTL, t } = useI18n();
+  const { lang, isRTL, isArabic, t } = useI18n();
   const [hidden, setHidden] = useState(secure);
   return (
     <View style={styles.field}>
@@ -23,7 +23,8 @@ export function TextField({ icon, secure = false, accessibilityLabel, ...input }
       <TextInput
         {...input}
         accessibilityLabel={accessibilityLabel}
-        style={[styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: "left", writingDirection: isRTL ? "rtl" : "ltr" }]}
+        // A text field does not flip "left" by itself in right-to-left mode, so the side comes from the real layout direction.
+        style={[styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: isRTL ? "right" : "left", writingDirection: isArabic ? "rtl" : "ltr" }]}
         placeholderTextColor={colors.textSecondary}
         autoCapitalize="none"
         autoCorrect={false}

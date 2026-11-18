@@ -206,6 +206,8 @@ export const en = {
   "profile.saved": "Saved",
   "profile.err.name": "Enter your name (up to 60 characters).",
   "profile.err.save": "Could not save. Check your connection and try again.",
+  "direction.banner": "To show the app right to left, it needs to restart.",
+  "direction.restart": "Restart",
 } as const;
 
 export type MessageKey = keyof typeof en;

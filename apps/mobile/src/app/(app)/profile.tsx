@@ -18,7 +18,7 @@ const MAX_NAME_LENGTH = 60;
 
 /** Edit the name and gender. Choosing a gender previews the colours straight away. */
 export default function ProfileScreen() {
-  const { t, lang, isRTL } = useI18n();
+  const { t, lang, isRTL, isArabic } = useI18n();
   const { profile, updateProfile } = useAuth();
   const { setPreviewGender } = useTheme();
   const [name, setName] = useState(profile?.display_name ?? "");
@@ -53,7 +53,7 @@ export default function ProfileScreen() {
             </AppText>
             <TextInput
               accessibilityLabel={t("profile.name")}
-              style={[styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: "left", writingDirection: isRTL ? "rtl" : "ltr" }]}
+              style={[styles.input, { fontFamily: fontFamily(lang, "400"), textAlign: isRTL ? "right" : "left", writingDirection: isArabic ? "rtl" : "ltr" }]}
               value={name}
               onChangeText={setName}
               placeholder={t("profile.namePlaceholder")}
