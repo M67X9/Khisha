@@ -163,7 +163,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: `ask` Edge Function; retrieve top-k memories for the user only; prompt that answers from them and labels anything else as general knowledge; save `conversations`, `messages`, `message_sources`; answer UI with clickable source cards linking to Memory Detail and showing the extracted evidence; reserve/settle credit; empty answer = no charge.
   - Test: after saving a receipt, ask "How much was my [store] receipt?" and receive the right amount with a tappable source that opens that memory; ask something not in memory and see it clearly say so rather than invent.
 
-- [ ] **M9 — Resilient workflow and temp-file cleanup**
+- [x] **M9 — Resilient workflow and temp-file cleanup** *(done: cleanup runs every 5 minutes; credit refunds come with M10)*
   - Build: automatic single retry on extraction failure, then a free manual Retry; failures refund the reservation; keep the picked file locally on connection loss and offer Retry; `pg_cron` runs the `cleanup` Edge Function every few minutes to delete temp uploads older than 1 hour (and their draft state); Review shows a clear "original expired" state.
   - Test: turn on Airplane Mode mid-upload, see Retry, reconnect and complete; trigger a forced model error (a debug flag) and see the retry then a free manual retry with credits unchanged; wait out the 1-hour expiry (or run the cleanup manually) and watch the abandoned file vanish.
 
