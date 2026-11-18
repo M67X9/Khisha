@@ -20,7 +20,7 @@ type I18nState = {
   lang: Lang;
   isRTL: boolean;
   t: (key: MessageKey, params?: Params) => string;
-  /** Western digits to Arabic-Indic digits when the app is in Arabic. */
+  /** Numbers always use Western digits (0-9), in English and Arabic. */
   formatNumber: (n: number | string) => string;
   setLanguage: (next: Lang) => Promise<void>;
 };
@@ -52,8 +52,6 @@ async function ensureDirection(lang: Lang): Promise<boolean> {
   DevSettings.reload();
   return true;
 }
-
-const ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang | null>(null);
@@ -91,7 +89,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       if (params) for (const k of Object.keys(params)) s = s.split(`{${k}}`).join(String(params[k]));
       return s;
     };
-    const formatNumber = (n: number | string) => (lang === "ar" ? String(n).replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]) : String(n));
+    const formatNumber = (n: number | string) => String(n);
     return { lang, isRTL: lang === "ar", t, formatNumber, setLanguage };
   }, [lang, setLanguage]);
 

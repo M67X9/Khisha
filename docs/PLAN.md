@@ -266,7 +266,7 @@ Based on reference apps the owner shared (a finance analytics app for gradient c
 **Components to design once:** gradient category card, hero card, white panel, glass button/chip, segmented control, floating bar, memory card (compact → expanded), confirm-field row, evidence chip (source link), usage meter, chat bubble with source cards.
 
 **Rules**
-- Arabic is a first-class design, not a mirror afterthought: right-to-left layout, mirrored back/chevron/corner-arrow icons, Arabic numerals handled consistently, longer strings tolerated.
+- Arabic is a first-class design, not a mirror afterthought: right-to-left layout, mirrored back/chevron/corner-arrow icons, numbers always shown with Western digits (0-9) in both languages (owner's choice; the Arabic Figma screens still show Arabic-Indic digits and need updating), longer strings tolerated.
 - Text contrast ≥ 4.5:1; white text only on dark or saturated gradients; touch targets ≥ 44 pt.
 - Expo Go-safe: gradients via `expo-linear-gradient`, glass via `expo-blur`, mesh-style glow via exported gradient images (no Skia). Use blur sparingly (floating bar and a few buttons), never on every list row.
 

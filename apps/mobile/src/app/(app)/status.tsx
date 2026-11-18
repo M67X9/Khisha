@@ -69,7 +69,7 @@ export default function StatusScreen() {
           )}
           {health.status === "ok" && health.db && (
             <AppText variant="caption" color={colors.textSecondary}>
-              {t("status.ok", { time: new Date(health.time).toLocaleTimeString() })}
+              {t("status.ok", { time: new Date(health.time).toLocaleTimeString("en-US") })}
             </AppText>
           )}
         </View>
