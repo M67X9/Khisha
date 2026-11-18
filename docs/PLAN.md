@@ -126,7 +126,7 @@ Each milestone ends with something a person can try. Tick the box when its "Test
   - Build: Supabase Auth; register, sign in, sign out, clear error messages; session persists in secure storage; `profiles` row auto-created by trigger.
   - Test: register a new account, force-quit and reopen the app (still signed in), sign out (back at sign-in), sign in with a wrong password (readable error).
 
-- [ ] **M2 — Arabic/English shell and Home**
+- [ ] **M2 — Arabic/English shell and Home** *(built and checked locally: i18n with English/Arabic, RTL switch with restart, Inter + Noto Sans Arabic, Home, Settings, placeholder screens, language saved on the profile; waiting for the manual test in Expo Go. Production builds need expo-updates for the restart.)*
   - Build: i18n with language switch; full RTL layout (RN needs a reload to flip direction); Home with Search, Ask AI, Add Memory, recent-memories list, usage indicator and Settings entries (placeholders OK); `preferred_language` saved on the profile.
   - Test: switch to Arabic from Settings; the whole app flips right-to-left and text is Arabic; switch back; choice survives a relaunch.
 

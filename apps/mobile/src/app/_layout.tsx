@@ -1,12 +1,34 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useRef } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
+import { I18nProvider, useI18n } from "../i18n";
 import { AuthProvider, useAuth } from "../lib/auth";
+import { supabase } from "../lib/supabase";
+import { useAppFonts } from "../ui/fonts";
 import { colors } from "../ui/theme";
+
+/** Keeps the saved profile language in step with the language chosen on this device (this device wins). */
+function useLanguageSync() {
+  const { lang } = useI18n();
+  const { profile } = useAuth();
+  const synced = useRef<string | null>(null);
+  useEffect(() => {
+    if (!profile || profile.preferred_language === lang) return;
+    const marker = `${profile.id}:${lang}`;
+    if (synced.current === marker) return;
+    synced.current = marker;
+    supabase.from("profiles").update({ preferred_language: lang }).eq("id", profile.id).then(({ error }) => {
+      if (error) synced.current = null; // try again next time
+    });
+  }, [profile, lang]);
+}
 
 function Navigator() {
   const { session, loading } = useAuth();
+  const fontsReady = useAppFonts();
+  useLanguageSync();
   return (
     <>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bgApp } }}>
@@ -18,8 +40,8 @@ function Navigator() {
           <Stack.Screen name="sign-up" />
         </Stack.Protected>
       </Stack>
-      {/* Cover the screen until the saved session has been read, so a signed-in user never sees the sign-in screen flash by. */}
-      {loading && (
+      {/* Cover the screen until the saved session and the fonts are ready, so nothing flashes by. */}
+      {(loading || !fontsReady) && (
         <View style={styles.loading} accessibilityLabel="Loading">
           <ActivityIndicator />
         </View>
@@ -30,10 +52,12 @@ function Navigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <StatusBar style="dark" />
-      <Navigator />
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <Navigator />
+      </AuthProvider>
+    </I18nProvider>
   );
 }
 

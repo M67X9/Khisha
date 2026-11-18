@@ -2,10 +2,11 @@ import type { Profile } from "@khisha/shared";
 import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { friendlyAuthError } from "./authErrors";
+import type { MessageKey } from "../i18n";
+import { authErrorKey } from "./authErrors";
 import { supabase } from "./supabase";
 
-export type AuthResult = { ok: true; needsEmailConfirmation?: boolean } | { ok: false; message: string };
+export type AuthResult = { ok: true; needsEmailConfirmation?: boolean } | { ok: false; messageKey: MessageKey };
 
 type AuthState = {
   session: Session | null;
@@ -74,15 +75,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string): Promise<AuthResult> => {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    return error ? { ok: false, message: friendlyAuthError(error) } : { ok: true };
+    return error ? { ok: false, messageKey: authErrorKey(error) } : { ok: true };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string): Promise<AuthResult> => {
     const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-    if (error) return { ok: false, message: friendlyAuthError(error) };
+    if (error) return { ok: false, messageKey: authErrorKey(error) };
     // With email confirmation on, an existing address returns a user with no identities and no error.
     if (data.user && data.user.identities && data.user.identities.length === 0) {
-      return { ok: false, message: "An account with this email already exists. Try signing in instead." };
+      return { ok: false, messageKey: "authErr.exists" };
     }
     return { ok: true, needsEmailConfirmation: !data.session };
   }, []);

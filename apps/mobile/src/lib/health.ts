@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 export type HealthState =
   | { status: "loading" }
   | { status: "unconfigured" }
-  | { status: "error"; message: string }
+  | { status: "error"; code: "http" | "unexpected" | "timeout" | "network"; httpStatus?: number }
   | { status: "ok"; db: boolean; time: string };
 
 /** Calls the `health` Edge Function and reports whether the function and the database both answer. */
@@ -21,13 +21,13 @@ export async function checkHealth(): Promise<HealthState> {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       signal: controller.signal,
     });
-    if (!res.ok) return { status: "error", message: `The function answered with HTTP ${res.status}.` };
+    if (!res.ok) return { status: "error", code: "http", httpStatus: res.status };
     const body: unknown = await res.json();
-    if (!isHealthResponse(body)) return { status: "error", message: "The function sent an unexpected answer." };
+    if (!isHealthResponse(body)) return { status: "error", code: "unexpected" };
     return { status: "ok", db: body.db, time: body.time };
   } catch (e) {
     const aborted = e instanceof Error && e.name === "AbortError";
-    return { status: "error", message: aborted ? "The request timed out." : "Could not reach the server. Check your connection." };
+    return { status: "error", code: aborted ? "timeout" : "network" };
   } finally {
     clearTimeout(timer);
   }

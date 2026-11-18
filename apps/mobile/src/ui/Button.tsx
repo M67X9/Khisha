@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
 
+import { AppText } from "./AppText";
 import { colors, radius } from "./theme";
 
 type Props = {
@@ -16,6 +17,7 @@ export function Button({ label, onPress, variant = "primary", loading = false, d
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled: inactive, busy: loading }}
       disabled={inactive}
       onPress={onPress}
@@ -24,7 +26,9 @@ export function Button({ label, onPress, variant = "primary", loading = false, d
       {loading ? (
         <ActivityIndicator color={isPrimary ? colors.textOnGradient : colors.ink} />
       ) : (
-        <Text style={[styles.label, { color: isPrimary ? colors.textOnGradient : colors.ink }]}>{label}</Text>
+        <AppText variant="bodyStrong" color={isPrimary ? colors.textOnGradient : colors.ink} style={{ textAlign: "center" }}>
+          {label}
+        </AppText>
       )}
     </Pressable>
   );
@@ -34,5 +38,4 @@ const styles = StyleSheet.create({
   base: { minHeight: 56, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
   primary: { backgroundColor: colors.ink },
   secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  label: { fontSize: 16, fontWeight: "600" },
 });

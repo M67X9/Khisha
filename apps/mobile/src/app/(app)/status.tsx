@@ -1,13 +1,18 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useI18n, type MessageKey } from "../../i18n";
 import { checkHealth, type HealthState } from "../../lib/health";
+import { AppText } from "../../ui/AppText";
+import { Button } from "../../ui/Button";
+import { ScreenHeader } from "../../ui/ScreenHeader";
+import { colors, gradients, radius } from "../../ui/theme";
 
-/** M0 status screen: proves the app can reach the Supabase Edge Function and the database. */
+/** Connection check: proves the app can reach the Supabase Edge Function and the database (kept from milestone M0). */
 export default function StatusScreen() {
+  const { t } = useI18n();
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
 
   const run = useCallback(async () => {
@@ -22,71 +27,84 @@ export default function StatusScreen() {
   const fnOk = health.status === "ok";
   const dbOk = health.status === "ok" && health.db;
 
+  const errorKey: MessageKey | null =
+    health.status === "error"
+      ? health.code === "http"
+        ? "status.http"
+        : health.code === "unexpected"
+          ? "status.unexpected"
+          : health.code === "timeout"
+            ? "status.timeout"
+            : "status.network"
+      : null;
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.page}>
-        <Pressable onPress={() => router.back()} accessibilityRole="button" hitSlop={10}>
-          <Text style={styles.back}>‹ Back</Text>
-        </Pressable>
-        <LinearGradient colors={["#5B3FB0", "#B58BE0"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <Text style={styles.arabic}>خِشّه</Text>
-          <Text style={styles.brand}>Khisha</Text>
-          <Text style={styles.tagline}>خِشّه الحين، تلقاه بعدين</Text>
+        <ScreenHeader title={t("status.title")} />
+        <LinearGradient colors={[...gradients.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <AppText variant="title" color={colors.textOnGradient}>
+            {t("status.title")}
+          </AppText>
         </LinearGradient>
 
         <View style={styles.panel}>
-          <Text style={styles.heading}>Connection check</Text>
-          <Row label="Edge Function" state={health.status === "loading" ? "loading" : fnOk ? "ok" : "fail"} />
-          <Row label="Database" state={health.status === "loading" ? "loading" : dbOk ? "ok" : "fail"} />
+          <Row label={t("status.function")} state={health.status === "loading" ? "loading" : fnOk ? "ok" : "fail"} />
+          <Row label={t("status.database")} state={health.status === "loading" ? "loading" : dbOk ? "ok" : "fail"} />
 
           {health.status === "unconfigured" && (
-            <Text style={styles.note}>
-              Not configured yet. Copy apps/mobile/.env.example to apps/mobile/.env and add your Supabase URL and anon key, then restart Expo.
-            </Text>
+            <AppText variant="caption" color={colors.textSecondary}>
+              {t("status.unconfigured")}
+            </AppText>
           )}
-          {health.status === "error" && <Text style={styles.noteError}>{health.message}</Text>}
-          {health.status === "ok" && !health.db && <Text style={styles.noteError}>The function answered but could not read the database.</Text>}
-          {health.status === "ok" && health.db && <Text style={styles.note}>All good. Server time {new Date(health.time).toLocaleTimeString()}.</Text>}
-
-          <Pressable onPress={run} style={({ pressed }) => [styles.button, pressed && { opacity: 0.8 }]} accessibilityRole="button">
-            <Text style={styles.buttonText}>Check again</Text>
-          </Pressable>
+          {errorKey && (
+            <AppText variant="caption" color={colors.statusError}>
+              {t(errorKey, { code: health.status === "error" ? (health.httpStatus ?? "") : "" })}
+            </AppText>
+          )}
+          {health.status === "ok" && !health.db && (
+            <AppText variant="caption" color={colors.statusError}>
+              {t("status.noDb")}
+            </AppText>
+          )}
+          {health.status === "ok" && health.db && (
+            <AppText variant="caption" color={colors.textSecondary}>
+              {t("status.ok", { time: new Date(health.time).toLocaleTimeString() })}
+            </AppText>
+          )}
         </View>
+
+        <Button label={t("status.again")} onPress={run} />
       </View>
     </SafeAreaView>
   );
 }
 
 function Row({ label, state }: { label: string; state: "loading" | "ok" | "fail" }) {
+  const { t } = useI18n();
   return (
     <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
+      <AppText variant="body">{label}</AppText>
       {state === "loading" ? (
         <ActivityIndicator />
       ) : (
-        <Text style={[styles.badge, state === "ok" ? styles.badgeOk : styles.badgeFail]}>{state === "ok" ? "✓ Working" : "✕ Not working"}</Text>
+        <View style={[styles.badge, state === "ok" ? styles.badgeOk : styles.badgeFail]}>
+          <AppText variant="label" color={state === "ok" ? colors.statusVerified : colors.statusError}>
+            {state === "ok" ? t("status.working") : t("status.notWorking")}
+          </AppText>
+        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#EEEEF0" },
+  safe: { flex: 1, backgroundColor: colors.bgApp },
   page: { flex: 1, padding: 16, gap: 16 },
-  back: { fontSize: 16, fontWeight: "600", color: "#111114" },
-  hero: { borderRadius: 28, padding: 24, gap: 4 },
-  arabic: { color: "#fff", fontSize: 40, fontWeight: "600" },
-  brand: { color: "#fff", fontSize: 28, fontWeight: "600" },
-  tagline: { color: "#fff", opacity: 0.92, fontSize: 16, marginTop: 4 },
-  panel: { backgroundColor: "#fff", borderRadius: 20, padding: 16, gap: 12 },
-  heading: { fontSize: 20, fontWeight: "600", color: "#111114" },
+  hero: { borderRadius: radius.lg, padding: 24 },
+  panel: { backgroundColor: colors.surface, borderRadius: radius.md, padding: 16, gap: 12 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", minHeight: 32 },
-  rowLabel: { fontSize: 16, color: "#111114" },
-  badge: { fontSize: 14, fontWeight: "600", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, overflow: "hidden" },
-  badgeOk: { color: "#157A52", backgroundColor: "rgba(21,122,82,0.13)" },
-  badgeFail: { color: "#C23636", backgroundColor: "rgba(194,54,54,0.12)" },
-  note: { fontSize: 13, color: "#6B6B76" },
-  noteError: { fontSize: 13, color: "#C23636" },
-  button: { backgroundColor: "#111114", borderRadius: 999, paddingVertical: 16, alignItems: "center", marginTop: 4 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill },
+  badgeOk: { backgroundColor: colors.tintVerified },
+  badgeFail: { backgroundColor: "rgba(194,54,54,0.12)" },
 });
